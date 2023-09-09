@@ -1,0 +1,5 @@
+(define (mystery L)
+(if (null? L)
+L
+(append (mystery (cdr L))
+(list (car L)))))

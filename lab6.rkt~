@@ -1,0 +1,32 @@
+#lang racket
+
+(define (Reflexive-Closure L S)
+  (if (null? S)
+      L
+      (let ((elem (car S)))
+        (if (member (list elem elem) L)
+            (Reflexive-Closure L (cdr S))
+            (Reflexive-Closure (cons (list elem elem) L) (cdr S))))))
+
+(define (Symmetric-Closure L)
+  (let loop ((L L) (result '()))
+    (if (null? L)
+        result
+        (let ((p (car L))
+              (rest (loop (cdr L) result)))
+          (if (member (list (cadr p) (car p)) rest)
+              rest
+              (cons (list (car p) (cadr p)) (cons (list (cadr p) (car p)) rest)))))))
+
+(define (Transitive-Closure L)
+  (define (Transitive-Closure-Helper L R)
+    (if (null? L)
+        R
+        (let* ((x (car L))
+               (rest (cdr L))
+               (y (filter (lambda (p) (eq? (cadr p) (car x))) R))
+               (new-pairs (map (lambda (p) (list (car x) (cadr p))) y))
+               (new-rel (append R new-pairs)))
+          (Transitive-Closure-Helper rest new-rel))))
+  (let ((result (Transitive-Closure-Helper L L)))
+    (filter (lambda (p) (eq? (car p) (cadr p))) result)))

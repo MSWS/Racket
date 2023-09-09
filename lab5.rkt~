@@ -1,0 +1,40 @@
+#lang racket
+; Reflexive?
+; Input: a list of pairs, L and a list S. Interpreting L as a binary relation over the set S,
+; Reflexive? returns #t if L is a reflexive relation over the set S and #f otherwise.
+(define (Reflexive? L S)
+  (cond ((null? S) #t) ; empty set is always reflexive
+        ((null? L) #t) ; empty relation is always reflexive
+        ((pair? (car L)) ; check if the first element of the first pair is a pair
+         (and (equal? (caar L) (cadar L)) ; check if (a, a) is in the relation for all a in S
+              (Reflexive? (cdr L) S)))
+        (else #f))) ; if the input is malformed, return false
+
+; Symmetric?
+; Input: a list of pairs, L. Interpreting L as a binary relation, Symmetric? returns #t if L is a
+; symmetric relation and #f otherwise.
+(define (Symmetric? L)
+  (cond ((null? L) #t) ; empty relation is always symmetric
+        ((pair? (car L)) ; check if the first element of the first pair is a pair
+         (and (member (cons (cdr (car L)) (car L)) L) ; check if (b, a) is in the relation for all (a, b) in L
+              (Symmetric? (cdr L))))
+        (else #f))) ; if the input is malformed, return false
+
+; Transitive?
+; Input: a list of pairs, L. Interpreting L as a binary relation, Transitive? returns #t if L is a
+; transitive relation and #f otherwise.
+(define (Transitive? L)
+  (cond ((null? L) #t) ; empty relation is always transitive
+        ((pair? (car L)) ; check if the first element of the first pair is a pair
+         (and (Transitive-helper (car L) (cdr L)) ; check if (a, c) is in the relation for all (a, b) and (b, c) in L
+              (Transitive? (cdr L))))
+        (else #f))) ; if the input is malformed, return false
+
+; Transitive-helper
+; Input: a pair (a, b) and a list of pairs L. Transitive-helper returns #t if (a, c) is in L for all
+; (a, b) and (b, c) in L, and #f otherwise.
+(define (Transitive-helper pair L)
+  (cond ((null? L) #t) ; base case: empty list is always transitive
+        ((equal? (cdr pair) (car (car L))) ; check if (b, c) is in the relation
+         (Transitive-helper pair (cdr L))) ; recurse on the rest of the list
+        (else (Transitive-helper pair (cdr L)))) ; if (b, c) is not in the relation, return false
